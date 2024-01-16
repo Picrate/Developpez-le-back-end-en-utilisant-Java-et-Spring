@@ -5,6 +5,7 @@ package info.patriceallary.chatop.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,8 @@ import java.nio.charset.StandardCharsets;
 public class SpringSecurityConfig {
 
     // salt used for generating BearerToken
-    private String jwtKey = "GFdLu89tyeBB55KOqkWuiV1VGHfK68Ij";
+    @Value("${JWT_SECRET_KEY}")
+    private String jwtKey;
 
     /**
      *
