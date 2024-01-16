@@ -1,3 +1,6 @@
+/**
+ * This class is used for managing generation of Bearer Token
+ */
 package info.patriceallary.chatop.services;
 
 
