@@ -23,8 +23,8 @@ public class DtoService {
         return modelMapper.map(user, UserDto.class);
     }
 
-    public TokenDto convertToTokenDto(String jwtToken) {
-        return modelMapper.map(jwtToken, TokenDto.class);
+    public TokenDto convertToTokenDto(String token) {
+        return modelMapper.map(token, TokenDto.class);
     }
 
     public MessageDto convertToMessageDto(String message){

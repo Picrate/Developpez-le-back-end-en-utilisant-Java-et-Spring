@@ -46,38 +46,37 @@ public class LoginController {
 
     /**
      * Login existing user with email and password
+     *
      * @param loginDto data send through request
      * @return OK Response (200) with Bearer Token in body if login succeeded or unauthorized(401) Response
      */
     @PostMapping("/login")
     public ResponseEntity<TokenDto> authenticateUser(@RequestBody LoginDto loginDto) {
 
-        // Login or Password invalid ?
-        if (loginDto.getLogin().isBlank() || loginDto.getPassword().isBlank()) {
-            return ResponseEntity.badRequest().build();
-        }
+        ResponseEntity<TokenDto> response = ResponseEntity.noContent().build();
         // Authenticate user
-        else {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginDto.getLogin(),
-                            loginDto.getPassword()
-                    )
-            );
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDto.getLogin(),
+                        loginDto.getPassword()
+                )
+        );
 
+        if (authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             // generate Bearer Token & convert to TokenDto
             // return OK response with Bearer Token in body
-            return ResponseEntity.ok(
-                    dtoService.convertToTokenDto(
-                            jwtService.generateToken(authentication)
-                    )
-            );
+            String token = jwtService.generateToken(authentication);
+            TokenDto tokenDto = new TokenDto();
+            tokenDto.setToken(token);
+            response = ResponseEntity.ok(tokenDto);
         }
+        return response;
     }
 
     /**
      * Register new user
+     *
      * @param registerDto new account information
      * @return
      */
@@ -85,14 +84,19 @@ public class LoginController {
     public ResponseEntity<TokenDto> registerUser(@RequestBody RegisterDto registerDto) {
         // Default Response BadRequest(400)
         ResponseEntity<TokenDto> response = ResponseEntity.badRequest().build();
-        // If User not exists
-        if (!userService.getUserByEmail(registerDto.getEmail()).isPresent()) {
-            // if account information send by user exists
-            if (registerDto.getEmail() != null && registerDto.getName() != null && registerDto.getPassword() != null) {
+        // If Account information are not empty or null
+        if (!registerDto.getEmail().isBlank()
+                && !registerDto.getName().isBlank()
+                && !registerDto.getPassword().isBlank()
+        ) {
+            // If User not exists
+            if (!userService.getUserByEmail(registerDto.getEmail()).isPresent()) {
+
                 // Encode password
                 String encodedPassword = passwordEncoder.encode(registerDto.getPassword());
                 // Create new User
                 User newUser = dtoService.convertToUserEntity(registerDto);
+                newUser.setPassword(encodedPassword);
                 // Assign Role "USER" to new user
                 newUser.addRole(roleService.findByName("USER").get());
                 // Save new User in database
@@ -103,10 +107,13 @@ public class LoginController {
                         registerDto.getPassword()
                 );
                 Authentication authenticationResponse = authenticationManager.authenticate(authenticationRequest);
-                TokenDto token = dtoService.convertToTokenDto(jwtService.generateToken(authenticationResponse));
+                String token = jwtService.generateToken(authenticationResponse);
+                TokenDto tokenDto = new TokenDto();
+                tokenDto.setToken(token);
 
                 // Send OK Response with BearerToken in body
-                response = ResponseEntity.ok(token);
+                response = ResponseEntity.ok(tokenDto);
+
             }
         }
         return response;
@@ -114,6 +121,7 @@ public class LoginController {
 
     /**
      * Send logged-in user account information
+     *
      * @param principal BearerTokon of logged in user
      * @return Account information without password
      */
