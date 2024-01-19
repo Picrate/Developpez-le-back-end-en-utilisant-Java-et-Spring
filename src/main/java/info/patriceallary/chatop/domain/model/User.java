@@ -5,6 +5,10 @@ package info.patriceallary.chatop.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,6 +20,7 @@ import java.util.List;
 @Entity
 @Transactional
 @Table(name = "USERS")
+@Getter
 public class User implements Serializable {
 
     @Serial
@@ -25,17 +30,29 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Setter
+    @Email
+    @NotEmpty
     private String email;
 
+    @NotEmpty
+    @Setter
     private String name;
 
+    @Setter
+    @NotEmpty
     private String password;
+
+    @Setter
     @Column(name = "created_at")
     private Timestamp createdAt;
+
+    @Setter
     @Column(name="updated_at")
     private Timestamp updatedAt;
 
 
+    @Getter
     @ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {CascadeType.MERGE, CascadeType.PERSIST}
@@ -55,48 +72,6 @@ public class User implements Serializable {
     }
 
     protected User() {}
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) { this.password = password; }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
 
     public void addRole(Role role) {
         this.roles.add(role);
