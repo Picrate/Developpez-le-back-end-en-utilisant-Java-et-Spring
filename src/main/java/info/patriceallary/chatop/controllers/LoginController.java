@@ -1,11 +1,11 @@
 package info.patriceallary.chatop.controllers;
 
-import info.patriceallary.chatop.configuration.CustomUserDetailsService;
 import info.patriceallary.chatop.domain.dto.LoginDto;
 import info.patriceallary.chatop.domain.dto.RegisterDto;
 import info.patriceallary.chatop.domain.dto.TokenDto;
 import info.patriceallary.chatop.domain.dto.UserDto;
 import info.patriceallary.chatop.domain.model.User;
+import info.patriceallary.chatop.services.DtoService;
 import info.patriceallary.chatop.services.JWTService;
 import info.patriceallary.chatop.services.RoleService;
 import info.patriceallary.chatop.services.UserService;
@@ -18,9 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,9 +36,9 @@ public class LoginController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private DtoService dtoService;
 
-    private JWTService jwtService;
+    private final JWTService jwtService;
 
     private LoginController(JWTService jwtService) {
         this.jwtService = jwtService;
@@ -69,19 +66,19 @@ public class LoginController {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            // generate Bearer Token
-            String jwtToken = jwtService.generateToken(authentication);
-            // Generate TokenDto with new BearerToken
-            TokenDto token = new TokenDto();
-            token.setToken(jwtToken);
+            // generate Bearer Token & convert to TokenDto
             // return OK response with Bearer Token in body
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(
+                    dtoService.convertToTokenDto(
+                            jwtService.generateToken(authentication)
+                    )
+            );
         }
     }
 
     /**
      * Register new user
-     * @param registerDto new account informations
+     * @param registerDto new account information
      * @return
      */
     @PostMapping("/register")
@@ -90,12 +87,12 @@ public class LoginController {
         ResponseEntity<TokenDto> response = ResponseEntity.badRequest().build();
         // If User not exists
         if (!userService.getUserByEmail(registerDto.getEmail()).isPresent()) {
-            // if account informations send by user exists
+            // if account information send by user exists
             if (registerDto.getEmail() != null && registerDto.getName() != null && registerDto.getPassword() != null) {
                 // Encode password
                 String encodedPassword = passwordEncoder.encode(registerDto.getPassword());
                 // Create new User
-                User newUser = new User(registerDto.getEmail(), registerDto.getName(), encodedPassword);
+                User newUser = dtoService.convertToUserEntity(registerDto);
                 // Assign Role "USER" to new user
                 newUser.addRole(roleService.findByName("USER").get());
                 // Save new User in database
@@ -106,9 +103,8 @@ public class LoginController {
                         registerDto.getPassword()
                 );
                 Authentication authenticationResponse = authenticationManager.authenticate(authenticationRequest);
-                String jwtToken = jwtService.generateToken(authenticationResponse);
-                TokenDto token = new TokenDto();
-                token.setToken(jwtToken);
+                TokenDto token = dtoService.convertToTokenDto(jwtService.generateToken(authenticationResponse));
+
                 // Send OK Response with BearerToken in body
                 response = ResponseEntity.ok(token);
             }
@@ -117,30 +113,25 @@ public class LoginController {
     }
 
     /**
-     * Send logged in user account informations
+     * Send logged-in user account information
      * @param principal BearerTokon of logged in user
-     * @return Account informations without password
+     * @return Account information without password
      */
     @GetMapping("/me")
     public ResponseEntity<UserDto> aboutMe(JwtAuthenticationToken principal) {
-        UserDto dto = new UserDto();
+        UserDto dto;
         // if user exists
         if (userService.getUserByEmail(principal.getName()).isPresent()) {
-            // Retrieve user datas
-            User authenticatedUser = userService.getUserByEmail(principal.getName()).get();
-            // Translate to Dto
-            dto.setId(authenticatedUser.getId());
-            dto.setName(authenticatedUser.getName());
-            dto.setEmail(authenticatedUser.getEmail());
-            DateTimeFormatter formater = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-            dto.setCreatedAt(formater.format(authenticatedUser.getCreatedAt().toLocalDateTime()));
-            if (authenticatedUser.getUpdatedAt() != null) {
-                dto.setUpdatedAt(formater.format(authenticatedUser.getUpdatedAt().toLocalDateTime()));
-            } else {
-                dto.setUpdatedAt("");
-            }
+            // Retrieve user datas & Translate to Dto
+            dto = dtoService.convertToUserDto(
+                    userService.getUserByEmail(
+                            principal.getName()
+                    ).get()
+            );
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        // Return account inforamtions
+        // Return account information
         return ResponseEntity.ok(dto);
     }
 }
