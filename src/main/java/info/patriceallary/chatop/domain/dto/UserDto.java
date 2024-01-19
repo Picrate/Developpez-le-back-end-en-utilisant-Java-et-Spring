@@ -3,7 +3,14 @@
  */
 package info.patriceallary.chatop.domain.dto;
 
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+
 public class UserDto {
+
+    private static final DateTimeFormatter formater = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+
     private Integer id;
     private String name;
     private String email;
@@ -41,15 +48,15 @@ public class UserDto {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = formater.format(createdAt.toLocalDateTime());
     }
 
     public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt =  updatedAt != null ?  formater.format(updatedAt.toLocalDateTime()) : "";
     }
 }

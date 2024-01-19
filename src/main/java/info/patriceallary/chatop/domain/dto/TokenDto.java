@@ -5,10 +5,9 @@
 package info.patriceallary.chatop.domain.dto;
 
 public class TokenDto {
-    String token;
+    private String token;
 
-    public TokenDto() {
-    }
+    public TokenDto() {}
     public String getToken() {
         return token;
     }
