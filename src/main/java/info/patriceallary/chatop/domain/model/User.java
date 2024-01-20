@@ -6,6 +6,7 @@ package info.patriceallary.chatop.domain.model;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,18 +33,19 @@ public class User implements Serializable {
 
     @Setter
     @Email
-    @NotEmpty
+    @NotBlank
     private String email;
 
-    @NotEmpty
     @Setter
+    @NotBlank
     private String name;
 
     @Setter
-    @NotEmpty
+    @NotBlank
     private String password;
 
     @Setter
+    @NotEmpty
     @Column(name = "created_at")
     private Timestamp createdAt;
 
@@ -64,6 +66,11 @@ public class User implements Serializable {
     )
     private List<Role> roles = new ArrayList<>();
 
+
+    @Getter
+    @OneToMany(mappedBy = "user")
+    private final List<Message> messages = new ArrayList<>();
+
     public User(String email, String name, String password) {
         this.email = email;
         this.name = name;
@@ -73,11 +80,12 @@ public class User implements Serializable {
 
     protected User() {}
 
+    // Roles Helper Functions
     public void addRole(Role role) {
         this.roles.add(role);
     }
-
     public void removeRole(Role role) {
         this.roles.remove(role);
     }
+
 }
