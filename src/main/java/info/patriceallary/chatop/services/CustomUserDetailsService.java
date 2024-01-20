@@ -2,12 +2,10 @@
  * This class generate a userDetails service from a userObject
  * It is used in application for authorization
  */
-package info.patriceallary.chatop.configuration;
+package info.patriceallary.chatop.services;
 
 import info.patriceallary.chatop.domain.model.Role;
 import info.patriceallary.chatop.domain.model.User;
-import info.patriceallary.chatop.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,9 +19,11 @@ import java.util.List;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    public CustomUserDetailsService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -41,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // assign application roles to user from his role in database
     private List<GrantedAuthority> getGrantedAuthorities(List<Role> roles) {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
             authorities.add(new SimpleGrantedAuthority("ROLE_"+role.getName()));
         }

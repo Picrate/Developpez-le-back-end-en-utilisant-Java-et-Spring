@@ -1,19 +1,17 @@
 package info.patriceallary.chatop.services;
 
-import info.patriceallary.chatop.domain.dto.MessageDto;
-import info.patriceallary.chatop.domain.dto.RegisterDto;
-import info.patriceallary.chatop.domain.dto.TokenDto;
-import info.patriceallary.chatop.domain.dto.UserDto;
+import info.patriceallary.chatop.domain.dto.*;
 import info.patriceallary.chatop.domain.model.User;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DtoService {
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    public DtoService(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
 
     public User convertToUserEntity(RegisterDto registerDto) {
         return modelMapper.map(registerDto, User.class);
@@ -24,7 +22,14 @@ public class DtoService {
     }
 
     public TokenDto convertToTokenDto(String token) {
-        return modelMapper.map(token, TokenDto.class);
+        return new TokenDto(token);
+    }
+
+    public LoginDto convertRegisterDtoToLoginDto(RegisterDto registerDto) {
+        LoginDto loginDto = new LoginDto();
+        loginDto.setLogin(registerDto.getEmail());
+        loginDto.setPassword(registerDto.getPassword());
+        return loginDto;
     }
 
     public MessageDto convertToMessageDto(String message){
