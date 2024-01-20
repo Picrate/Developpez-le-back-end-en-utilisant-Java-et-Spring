@@ -4,15 +4,15 @@
  */
 package info.patriceallary.chatop.domain.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class TokenDto {
     private String token;
 
-    public TokenDto() {}
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
+    public TokenDto(String token) {
         this.token = token;
     }
 }

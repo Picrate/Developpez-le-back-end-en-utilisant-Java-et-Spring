@@ -7,6 +7,9 @@ package info.patriceallary.chatop.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -17,12 +20,15 @@ import java.util.List;
 @Entity
 @Transactional
 @Table(name = "ROLES")
+@Getter
+@Setter
 public class Role implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotEmpty
     private String name;
 
     @Column(name = "created_at", nullable = false)
@@ -39,35 +45,6 @@ public class Role implements Serializable {
     public Role(String name) {
         this.name = name;
         this.createdAt = Timestamp.valueOf(LocalDate.now().atStartOfDay());
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<User> getUsers() {
-        return users;
     }
 
     public void addUser(User user) {
