@@ -1,6 +1,7 @@
 package info.patriceallary.chatop.domain.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class Message implements Serializable {
     private Integer id;
 
     @NotBlank()
+    @Max(2000)
     private String message;
 
     @NotEmpty()

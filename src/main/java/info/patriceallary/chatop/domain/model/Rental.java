@@ -1,6 +1,7 @@
 package info.patriceallary.chatop.domain.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,20 +24,28 @@ public class Rental implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
+    @Max(255)
     private String name;
 
-    private Integer surface;
+    @PositiveOrZero
+    private Float surface;
 
-    private Integer price;
+    @PositiveOrZero
+    private Float price;
 
+    @Max(255)
     private String picture;
 
+    @Max(2000)
     private String description;
 
     @ManyToOne()
     @Column(name = "owner_id", nullable = false)
+    @NotEmpty
     private User owner;
 
+    @NotEmpty
     private Timestamp created_at;
 
     private Timestamp updated_at;
