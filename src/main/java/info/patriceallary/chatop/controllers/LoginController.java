@@ -20,15 +20,17 @@ public class LoginController {
 
     private final LoginAndRegisterService loginAndRegisterService;
 
-    private UserService userService;
+    private final UserService userService;
 
-    private DtoService dtoService;
+    private final DtoService dtoService;
 
     private final JWTService jwtService;
 
-    public LoginController(JWTService jwtService, LoginAndRegisterService loginAndRegisterService) {
+    public LoginController(JWTService jwtService, LoginAndRegisterService loginAndRegisterService, DtoService dtoService, UserService userService) {
         this.jwtService = jwtService;
         this.loginAndRegisterService = loginAndRegisterService;
+        this.dtoService = dtoService;
+        this.userService = userService;
     }
 
     /**
