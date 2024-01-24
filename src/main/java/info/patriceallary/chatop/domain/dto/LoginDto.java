@@ -15,10 +15,8 @@ public class LoginDto {
 
     @NotBlank
     @Email
-    @Max(255)
     private String login;
 
     @NotBlank
-    @Max(255)
     private String password;
 }
