@@ -25,7 +25,6 @@ public class Rental implements Serializable {
     private Integer id;
 
     @NotBlank
-    @Max(255)
     private String name;
 
     @PositiveOrZero
@@ -34,15 +33,12 @@ public class Rental implements Serializable {
     @PositiveOrZero
     private Float price;
 
-    @Max(255)
     private String picture;
 
-    @Max(2000)
     private String description;
 
     @ManyToOne()
     @JoinColumn(name = "owner_id", nullable = false)
-    @NotEmpty
     private User owner;
 
     @Column(name = "created_at", nullable = false)

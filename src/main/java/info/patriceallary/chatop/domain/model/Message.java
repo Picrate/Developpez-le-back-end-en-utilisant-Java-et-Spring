@@ -26,7 +26,6 @@ public class Message implements Serializable {
     private Integer id;
 
     @NotBlank()
-    @Max(2000)
     private String message;
 
     @Column(name = "created_at", nullable = false)
@@ -35,12 +34,10 @@ public class Message implements Serializable {
     @Column(name = "updated_at")
     private Timestamp updated_at;
 
-    @NotEmpty
     @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @NotEmpty
     @ManyToOne()
     @JoinColumn(name = "rental_id", nullable = false)
     private Rental rental;

@@ -3,25 +3,32 @@ package info.patriceallary.chatop.services;
 import info.patriceallary.chatop.domain.dto.*;
 import info.patriceallary.chatop.domain.model.Rental;
 import info.patriceallary.chatop.domain.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class DtoService {
     private final ModelMapper modelMapper;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final RentalService rentalService;
 
-    public DtoService(ModelMapper modelMapper, RentalService rentalService)
+    private final FileSystemStorageService storageService;
+
+    private final PictureManager pictureManager;
+
+    public DtoService(ModelMapper modelMapper, RentalService rentalService, FileSystemStorageService storageService, PictureManager pictureManager)
     {
         this.modelMapper = modelMapper;
         this.rentalService = rentalService;
+        this.storageService = storageService;
+        this.pictureManager = pictureManager;
     }
 
     public User convertToUserEntity(RegisterDto registerDto) {
@@ -43,7 +50,21 @@ public class DtoService {
         return loginDto;
     }
 
-    public Rental convertToRental(RentalDto rentalDto) {return modelMapper.map(rentalDto, Rental.class);}
+    public Rental convertToRental(RentalDto rentalDto) {
+        if (Boolean.TRUE.equals(this.pictureManager.isValidPicture(rentalDto.getPicture())))
+        {
+            String encodedFileName = null;
+            try {
+                encodedFileName = this.pictureManager.sanitizeAndEncodeFilename(rentalDto.getPicture());
+                this.storageService.store(rentalDto.getPicture(), encodedFileName);
+
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            rentalDto.setPictureUrl(encodedFileName);
+        }
+        return modelMapper.map(rentalDto, Rental.class);
+    }
 
     public MessageDto convertToMessageDto(String message){
         return modelMapper.map(message, MessageDto.class);
@@ -58,7 +79,7 @@ public class DtoService {
     }
 
     public Iterable<RentalDto> getAllRentalDtos() {
-        return this.rentalService.getAllReantals().stream().map(rental -> modelMapper.map(rental, RentalDto.class)).collect(Collectors.toList());
+        return this.rentalService.getAllReantals().stream().map(rental -> modelMapper.map(rental, RentalDto.class)).toList();
     }
 
     public RentalDto getRentalDtoById(Integer id) {
