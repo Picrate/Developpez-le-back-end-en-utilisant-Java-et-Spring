@@ -3,9 +3,10 @@ package info.patriceallary.chatop.services;
 import info.patriceallary.chatop.configuration.PictureStorageConfiguration;
 import info.patriceallary.chatop.exception.StorageException;
 import info.patriceallary.chatop.exception.StorageFileNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.util.FileSystemUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,22 +14,28 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
 
+@Service
+@Slf4j
 public class FileSystemStorageService implements StorageService {
 
     private final Path rootLocation;
 
-    public FileSystemStorageService(PictureStorageConfiguration storageConfiguration) {
+    private final PictureManager pictureManager;
 
-        if (storageConfiguration.getLocation().trim().isEmpty()) {
+    public FileSystemStorageService(PictureStorageConfiguration storageConfiguration, PictureManager pictureManager) {
+
+        this.pictureManager = pictureManager;
+
+        if (storageConfiguration.getPictureStorageLocation().getLocation().trim().isEmpty()) {
             throw new StorageException("File upload location can not be Empty.");
         }
-
-        this.rootLocation = Paths.get(storageConfiguration.getLocation());
+        this.rootLocation = Paths.get(storageConfiguration.getPictureStorageLocation().getLocation());
     }
 
     @Override
     public void init() {
         try {
+            log.info("Setting Picture Upload Location to : "+rootLocation);
             if(!Files.exists(rootLocation)) {
                 Files.createDirectories(rootLocation);
             }
@@ -39,7 +46,7 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public void store(MultipartFile file) {
+    public void store(MultipartFile file, String destinationFilename) {
 
         try {
 
@@ -47,18 +54,22 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("Failed to store empty file.");
             }
 
-            Path destinationFile = this.rootLocation.resolve(
-                            Paths.get(file.getOriginalFilename()))
-                    .normalize().toAbsolutePath();
+                Path destinationFile = this.rootLocation.resolve(
+                                Paths.get(destinationFilename))
+                        .normalize().toAbsolutePath();
 
-            // Check if attempting to store outside rootDirectory
-            if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-                throw new StorageException("Cannot store file outside current directory");
-            }
+                log.info("Destination Path : "+destinationFile.toString());
 
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            }
+                // Check if attempting to store outside rootDirectory
+                if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+                    throw new StorageException("Cannot store file outside current directory");
+                }
+
+                try (InputStream inputStream = file.getInputStream()) {
+                    Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }
