@@ -1,7 +1,7 @@
 /**
  * Used for managing Users BO in application
  */
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.domain;
 
 import info.patriceallary.chatop.domain.model.User;
 import info.patriceallary.chatop.repository.UserRepository;
@@ -21,6 +21,8 @@ public class UserService {
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }
+
+    public Optional<User> getUserById(Integer id){ return userRepository.findById(id);}
 
     public boolean userExists(String email) {
         return getUserByEmail(email).isPresent();

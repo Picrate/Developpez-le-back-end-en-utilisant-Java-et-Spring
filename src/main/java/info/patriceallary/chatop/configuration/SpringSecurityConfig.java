@@ -4,7 +4,7 @@
 package info.patriceallary.chatop.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import info.patriceallary.chatop.services.CustomUserDetailsService;
+import info.patriceallary.chatop.services.auth.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,9 +36,6 @@ public class SpringSecurityConfig {
     @Value("${JWT_SECRET_KEY}")
     private String jwtKey;
 
-    public SpringSecurityConfig(CustomUserDetailsService customUserDetailsService) {
-    }
-
     /**
      * SecurityFilterChain used for managing authorization through the application
      */
@@ -53,14 +50,15 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();
     }
 
+    // Token Bearer Decoder
     @Bean
     public JwtDecoder jwtDecoder() {
         SecretKeySpec secretKey = new SecretKeySpec(
@@ -71,6 +69,8 @@ public class SpringSecurityConfig {
         return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
+
+    // Token Bearer Encoder
     @Bean
     public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(this.jwtKey.getBytes(StandardCharsets.UTF_8)));
@@ -82,7 +82,7 @@ public class SpringSecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    // Manage Authentication throught application
+    // Manage Authentication through application
     @Bean
     public AuthenticationManager authenticationManager(
             CustomUserDetailsService userDetailsService,

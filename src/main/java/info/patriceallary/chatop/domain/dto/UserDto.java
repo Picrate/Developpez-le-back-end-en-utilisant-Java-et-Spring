@@ -3,41 +3,31 @@
  */
 package info.patriceallary.chatop.domain.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-
 @Getter
+@Setter
 public class UserDto {
 
-    private static final DateTimeFormatter formater = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+    private static final String VALID_DATE_PATTERN = "^\\d{2}/\\d{2}/\\d{4}$";
 
-    @Setter
     @NotEmpty
     private Integer id;
 
-    @Setter
-    @NotEmpty
+    @NotBlank
+    @Max(255)
     private String name;
 
-    @Setter
-    @NotEmpty
+    @NotBlank
+    @Email
     private String email;
 
     @NotEmpty
+    @Pattern(regexp = VALID_DATE_PATTERN)
     private String createdAt;
 
+    @Pattern(regexp = VALID_DATE_PATTERN)
     private String updatedAt;
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = formater.format(createdAt.toLocalDateTime());
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt =  updatedAt != null ?  formater.format(updatedAt.toLocalDateTime()) : "";
-    }
 }

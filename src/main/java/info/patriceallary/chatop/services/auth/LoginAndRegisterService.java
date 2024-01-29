@@ -1,13 +1,20 @@
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.auth;
 
 import info.patriceallary.chatop.domain.dto.LoginDto;
 import info.patriceallary.chatop.domain.dto.RegisterDto;
+import info.patriceallary.chatop.domain.model.Role;
 import info.patriceallary.chatop.domain.model.User;
+import info.patriceallary.chatop.services.domain.RoleService;
+import info.patriceallary.chatop.services.domain.UserService;
+import info.patriceallary.chatop.services.dto.DtoService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class LoginAndRegisterService {
@@ -42,9 +49,11 @@ public class LoginAndRegisterService {
 
         User newUser = dtoService.convertToUserEntity(registerDto);
         // Assign Role "USER" to new user
-        if (this.roleService.findByName("USER").isPresent()) {
-            newUser.addRole(this.roleService.findByName("USER").get());
+        Optional<Role> optionalRole = this.roleService.findByName("USER");
+        if (optionalRole.isEmpty()) {
+            throw new NoSuchElementException("Role Not Found");
         }
+        newUser.addRole(optionalRole.get());
         newUser.setPassword(this.passwordEncoder.encode(registerDto.getPassword()));
         // Save new User in database
         this.userService.saveUser(newUser);

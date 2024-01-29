@@ -1,7 +1,7 @@
 /**
  * This class is used for managing generation of Bearer Token
  */
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.auth;
 
 
 import org.springframework.security.core.Authentication;
