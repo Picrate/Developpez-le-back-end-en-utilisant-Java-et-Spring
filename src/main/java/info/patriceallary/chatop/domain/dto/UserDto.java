@@ -7,10 +7,6 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-
 @Getter
 @Setter
 public class UserDto {

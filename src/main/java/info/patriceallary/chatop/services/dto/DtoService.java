@@ -1,3 +1,6 @@
+/**
+ * This Class manages Entities & DTO Conversion
+ */
 package info.patriceallary.chatop.services.dto;
 
 import info.patriceallary.chatop.domain.dto.*;
@@ -14,21 +17,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class DtoService {
     private final ModelMapper modelMapper;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final RentalService rentalService;
-
     private final UserService userService;
-
     private final FileSystemStorageService storageService;
-
     private final PictureManager pictureManager;
 
     public DtoService(ModelMapper modelMapper, RentalService rentalService, UserService userService, FileSystemStorageService storageService, PictureManager pictureManager)
@@ -40,13 +37,9 @@ public class DtoService {
         this.pictureManager = pictureManager;
     }
 
-    public User convertToUserEntity(RegisterDto registerDto) {
-        return modelMapper.map(registerDto, User.class);
-    }
-
-    public UserDto convertToUserDto(User user) {
-        return modelMapper.map(user, UserDto.class);
-    }
+    /*
+        LOGIN & TOKEN CONVERTERS
+     */
 
     public TokenDto convertToTokenDto(String token) {
         return new TokenDto(token);
@@ -59,13 +52,21 @@ public class DtoService {
         return modelMapper.map(registerDto, LoginDto.class);
     }
 
-    public Rental convertToRental(RentalDto rentalDto) {
-        return modelMapper.map(rentalDto, Rental.class);
+    /*
+        USER & USERDTO CONVERTERS
+     */
+
+    public User convertToUserEntity(RegisterDto registerDto) {
+        return modelMapper.map(registerDto, User.class);
     }
 
-    public MessageDto convertToMessageDto(String message){
-        return modelMapper.map(message, MessageDto.class);
+    public UserDto convertToUserDto(User user) {
+        return modelMapper.map(user, UserDto.class);
     }
+
+    /*
+        MESSAGEDTO -> MESSAGE CONVERTER
+     */
 
     public Message convertToMessage(MessageDto messageDto) {
 
@@ -82,23 +83,22 @@ public class DtoService {
         return modelMapper.map(messageDto, Message.class);
     }
 
-    public String convertToValidDate(Timestamp timestamp) {
-        return formatter.format(timestamp.toLocalDateTime());
-    }
-
-    public Timestamp convertToTimestamp(String dtoDate) {
-        return Timestamp.valueOf(dtoDate);
-    }
+    /*
+        RENTAL & RENTALDTO CONVERTERS
+     */
 
     public Iterable<RentalDto> getAllRentalDtos() {
-        return this.rentalService.getAllReantals().stream().map(rental -> modelMapper.map(rental, RentalDto.class)).toList();
+        return this.rentalService.getAllRentals().stream().map(
+                rental -> modelMapper.map(rental, RentalDto.class)
+        ).toList();
     }
 
     public RentalDto getRentalDtoById(Integer id) {
-        if (this.rentalService.getRentalById(id).isPresent())
-            return modelMapper.map(this.rentalService.getRentalById(id).get(), RentalDto.class);
-        else
-            return null;
+        Optional<Rental> optionalRental = this.rentalService.getRentalById(id);
+        return optionalRental.map(rental -> modelMapper.map(rental, RentalDto.class)).orElse(null);
+    }
+    public Rental convertToRental(RentalDto rentalDto) {
+        return modelMapper.map(rentalDto, Rental.class);
     }
 
     public Rental convertFormRentalToRental(FormRentalDto formRentalDto, String requestURL) {
@@ -120,10 +120,10 @@ public class DtoService {
 
         }
         modelMapper.typeMap(FormRentalDto.class, Rental.class).addMappings(
-                mapper -> mapper.skip(Rental::setPictureURL)
+                mapper -> mapper.skip(Rental::setPicture)
         );
         Rental rental = modelMapper.map(formRentalDto, Rental.class);
-        rental.setPictureURL(pictureURL);
+        rental.setPicture(pictureURL);
         return rental;
     }
 }

@@ -4,6 +4,7 @@ import info.patriceallary.chatop.domain.dto.LoginDto;
 import info.patriceallary.chatop.domain.dto.RegisterDto;
 import info.patriceallary.chatop.domain.dto.TokenDto;
 import info.patriceallary.chatop.domain.dto.UserDto;
+import info.patriceallary.chatop.domain.model.User;
 import info.patriceallary.chatop.services.dto.DtoService;
 import info.patriceallary.chatop.services.auth.JWTService;
 import info.patriceallary.chatop.services.auth.LoginAndRegisterService;
@@ -14,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -81,11 +85,11 @@ public class LoginController {
         // if user exists
         if (userService.userExists(principal.getName())) {
             // Retrieve user datas & Translate to Dto
-            dto = dtoService.convertToUserDto(
-                    userService.getUserByEmail(
-                            principal.getName()
-                    ).get()
-            );
+            Optional<User> optionalUser = userService.getUserByEmail(principal.getName());
+            if(optionalUser.isEmpty()){
+                throw new NoSuchElementException("User Not Found");
+            }
+            dto = dtoService.convertToUserDto(optionalUser.get());
         } else {
             return ResponseEntity.notFound().build();
         }
