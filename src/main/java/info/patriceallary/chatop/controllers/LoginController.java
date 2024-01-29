@@ -4,31 +4,39 @@ import info.patriceallary.chatop.domain.dto.LoginDto;
 import info.patriceallary.chatop.domain.dto.RegisterDto;
 import info.patriceallary.chatop.domain.dto.TokenDto;
 import info.patriceallary.chatop.domain.dto.UserDto;
-import info.patriceallary.chatop.services.DtoService;
-import info.patriceallary.chatop.services.JWTService;
-import info.patriceallary.chatop.services.LoginAndRegisterService;
-import info.patriceallary.chatop.services.UserService;
+import info.patriceallary.chatop.domain.model.User;
+import info.patriceallary.chatop.services.dto.DtoService;
+import info.patriceallary.chatop.services.auth.JWTService;
+import info.patriceallary.chatop.services.auth.LoginAndRegisterService;
+import info.patriceallary.chatop.services.domain.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class LoginController {
 
     private final LoginAndRegisterService loginAndRegisterService;
 
-    private UserService userService;
+    private final UserService userService;
 
-    private DtoService dtoService;
+    private final DtoService dtoService;
 
     private final JWTService jwtService;
 
-    public LoginController(JWTService jwtService, LoginAndRegisterService loginAndRegisterService) {
+    public LoginController(JWTService jwtService, LoginAndRegisterService loginAndRegisterService, DtoService dtoService, UserService userService) {
         this.jwtService = jwtService;
         this.loginAndRegisterService = loginAndRegisterService;
+        this.dtoService = dtoService;
+        this.userService = userService;
     }
 
     /**
@@ -50,12 +58,7 @@ public class LoginController {
         return response;
     }
 
-    /**
-     * Register new user
-     *
-     * @param registerDto new account information
-     * @return
-     */
+    // Register new User
     @PostMapping("/register")
     public ResponseEntity<TokenDto> registerUser(@RequestBody @Valid RegisterDto registerDto) {
         // Default Response BadRequest(400)
@@ -73,7 +76,7 @@ public class LoginController {
     /**
      * Send logged-in user account information
      *
-     * @param principal BearerTokon of logged in user
+     * @param principal BearerToken of logged in user
      * @return Account information without password
      */
     @GetMapping("/me")
@@ -82,11 +85,11 @@ public class LoginController {
         // if user exists
         if (userService.userExists(principal.getName())) {
             // Retrieve user datas & Translate to Dto
-            dto = dtoService.convertToUserDto(
-                    userService.getUserByEmail(
-                            principal.getName()
-                    ).get()
-            );
+            Optional<User> optionalUser = userService.getUserByEmail(principal.getName());
+            if(optionalUser.isEmpty()){
+                throw new NoSuchElementException("User Not Found");
+            }
+            dto = dtoService.convertToUserDto(optionalUser.get());
         } else {
             return ResponseEntity.notFound().build();
         }
