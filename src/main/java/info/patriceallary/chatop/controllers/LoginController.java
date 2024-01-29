@@ -50,7 +50,6 @@ public class LoginController {
 
         ResponseEntity<TokenDto> response = ResponseEntity.noContent().build();
         Authentication authentication = this.loginAndRegisterService.authenticateUser(loginDto);
-        log.info("USERNAME : "+authentication.getName());
         if(authentication.isAuthenticated()) {
             response = ResponseEntity.ok(
                     dtoService.convertToTokenDto(this.jwtService.generateToken(authentication))

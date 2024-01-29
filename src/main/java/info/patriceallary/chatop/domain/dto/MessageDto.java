@@ -1,9 +1,6 @@
 package info.patriceallary.chatop.domain.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +9,7 @@ import lombok.Setter;
 public class MessageDto {
 
     @NotBlank
-    @Max(2000)
+    @Size(min = 1, max = 2000)
     private String message;
 
     @NotEmpty

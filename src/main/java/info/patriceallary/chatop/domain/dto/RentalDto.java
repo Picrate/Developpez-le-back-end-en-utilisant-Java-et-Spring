@@ -1,9 +1,6 @@
 package info.patriceallary.chatop.domain.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +14,7 @@ public class RentalDto {
     private Integer id;
 
     @NotBlank
+    @Size(min = 1, max = 255)
     private String name;
 
     @Positive
@@ -29,6 +27,8 @@ public class RentalDto {
 
     private String picture;
 
+    @NotBlank
+    @Size(max = 2000)
     private String description;
 
     private Integer owner_id;
