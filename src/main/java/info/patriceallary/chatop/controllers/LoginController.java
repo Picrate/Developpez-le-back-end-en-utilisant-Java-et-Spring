@@ -4,16 +4,18 @@ import info.patriceallary.chatop.domain.dto.LoginDto;
 import info.patriceallary.chatop.domain.dto.RegisterDto;
 import info.patriceallary.chatop.domain.dto.TokenDto;
 import info.patriceallary.chatop.domain.dto.UserDto;
-import info.patriceallary.chatop.services.DtoService;
-import info.patriceallary.chatop.services.JWTService;
-import info.patriceallary.chatop.services.LoginAndRegisterService;
-import info.patriceallary.chatop.services.UserService;
+import info.patriceallary.chatop.services.dto.DtoService;
+import info.patriceallary.chatop.services.auth.JWTService;
+import info.patriceallary.chatop.services.auth.LoginAndRegisterService;
+import info.patriceallary.chatop.services.domain.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class LoginController {
@@ -44,6 +46,7 @@ public class LoginController {
 
         ResponseEntity<TokenDto> response = ResponseEntity.noContent().build();
         Authentication authentication = this.loginAndRegisterService.authenticateUser(loginDto);
+        log.info("USERNAME : "+authentication.getName());
         if(authentication.isAuthenticated()) {
             response = ResponseEntity.ok(
                     dtoService.convertToTokenDto(this.jwtService.generateToken(authentication))
@@ -52,12 +55,6 @@ public class LoginController {
         return response;
     }
 
-    /**
-     * Register new user
-     *
-     * @param registerDto new account information
-     * @return
-     */
     @PostMapping("/register")
     public ResponseEntity<TokenDto> registerUser(@RequestBody @Valid RegisterDto registerDto) {
         // Default Response BadRequest(400)

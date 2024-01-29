@@ -1,6 +1,6 @@
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.storage;
 
-import info.patriceallary.chatop.configuration.PictureStorageConfiguration;
+import info.patriceallary.chatop.configuration.SpringConfiguration;
 import info.patriceallary.chatop.exception.StorageException;
 import info.patriceallary.chatop.exception.StorageFileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,16 +21,14 @@ public class FileSystemStorageService implements StorageService {
 
     private final Path rootLocation;
 
-    private final PictureManager pictureManager;
+        public FileSystemStorageService(SpringConfiguration configuration) {
 
-    public FileSystemStorageService(PictureStorageConfiguration storageConfiguration, PictureManager pictureManager) {
 
-        this.pictureManager = pictureManager;
 
-        if (storageConfiguration.getPictureStorageLocation().getLocation().trim().isEmpty()) {
+        if (configuration.getPictureStorageLocation().getPath().toString().isEmpty()) {
             throw new StorageException("File upload location can not be Empty.");
         }
-        this.rootLocation = Paths.get(storageConfiguration.getPictureStorageLocation().getLocation());
+        this.rootLocation = configuration.getPictureStorageLocation().getPath();
     }
 
     @Override
@@ -81,7 +79,9 @@ public class FileSystemStorageService implements StorageService {
         return rootLocation.resolve(filename);
     }
 
-    public URI getURI(String filename) {return rootLocation.resolve(filename).toUri(); }
+    public URI getURI(String filename) {
+            return rootLocation.resolve(filename).toUri();
+        }
 
     @Override
     public Resource loadAsResource(String filename) {

@@ -33,7 +33,8 @@ public class Rental implements Serializable {
     @PositiveOrZero
     private Float price;
 
-    private String picture;
+    @Column(name = "picture_url", nullable = false)
+    private String pictureURL;
 
     private String description;
 

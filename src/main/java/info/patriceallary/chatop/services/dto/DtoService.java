@@ -1,12 +1,17 @@
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.dto;
 
 import info.patriceallary.chatop.domain.dto.*;
+import info.patriceallary.chatop.domain.model.Message;
 import info.patriceallary.chatop.domain.model.Rental;
 import info.patriceallary.chatop.domain.model.User;
+import info.patriceallary.chatop.services.domain.RentalService;
+import info.patriceallary.chatop.services.domain.UserService;
+import info.patriceallary.chatop.services.storage.FileSystemStorageService;
+import info.patriceallary.chatop.services.tools.PictureManager;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.sql.Timestamp;
@@ -20,14 +25,17 @@ public class DtoService {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final RentalService rentalService;
 
+    private final UserService userService;
+
     private final FileSystemStorageService storageService;
 
     private final PictureManager pictureManager;
 
-    public DtoService(ModelMapper modelMapper, RentalService rentalService, FileSystemStorageService storageService, PictureManager pictureManager)
+    public DtoService(ModelMapper modelMapper, RentalService rentalService, UserService userService, FileSystemStorageService storageService, PictureManager pictureManager)
     {
         this.modelMapper = modelMapper;
         this.rentalService = rentalService;
+        this.userService = userService;
         this.storageService = storageService;
         this.pictureManager = pictureManager;
     }
@@ -51,12 +59,27 @@ public class DtoService {
         return modelMapper.map(registerDto, LoginDto.class);
     }
 
-    public Rental convertToRental(RentalDto rentalDto, MultipartFile picture) {
-
+    public Rental convertToRental(RentalDto rentalDto) {
+        return modelMapper.map(rentalDto, Rental.class);
     }
 
     public MessageDto convertToMessageDto(String message){
         return modelMapper.map(message, MessageDto.class);
+    }
+
+    public Message convertToMessage(MessageDto messageDto) {
+
+        Converter<Integer, User> userIdToUser = mappingContext -> userService.getUserById(mappingContext.getSource()).get();
+        Converter<Integer, Rental> rentalIdToRental = mappingContext -> rentalService.getRentalById(mappingContext.getSource()).get();
+
+        modelMapper.typeMap(MessageDto.class, Message.class).addMappings(
+            mapper -> mapper.using(userIdToUser).map(MessageDto::getUser_id, Message::setUser)
+        );
+        modelMapper.typeMap(MessageDto.class, Message.class).addMappings(
+                mapper -> mapper.using(rentalIdToRental).map(MessageDto::getRental_id, Message::setRental)
+        );
+
+        return modelMapper.map(messageDto, Message.class);
     }
 
     public String convertToValidDate(Timestamp timestamp) {
@@ -78,8 +101,7 @@ public class DtoService {
             return null;
     }
 
-
-    public Rental convertFormRentalDtoToRental(FormRentalDto formRentalDto) {
+    public Rental convertFormRentalToRental(FormRentalDto formRentalDto, String requestURL) {
 
         String pictureURL = "N/A";
 
@@ -90,14 +112,18 @@ public class DtoService {
                 encodedFileName = this.pictureManager.sanitizeAndEncodeFilename(formRentalDto.getPicture());
                 this.storageService.store(formRentalDto.getPicture(), encodedFileName);
 
-                pictureURL = this.storageService.getURI(encodedFileName).getPath();
+                pictureURL = pictureManager.getPictureUrl(encodedFileName, requestURL);
 
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
         }
-        modelMapper.typeMap(FormRentalDto.class, Rental.class).
-        return modelMapper.map(rentalDto, Rental.class);
+        modelMapper.typeMap(FormRentalDto.class, Rental.class).addMappings(
+                mapper -> mapper.skip(Rental::setPictureURL)
+        );
+        Rental rental = modelMapper.map(formRentalDto, Rental.class);
+        rental.setPictureURL(pictureURL);
+        return rental;
     }
 }

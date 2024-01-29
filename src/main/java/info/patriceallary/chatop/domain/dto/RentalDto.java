@@ -1,9 +1,11 @@
 package info.patriceallary.chatop.domain.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -25,9 +27,7 @@ public class RentalDto {
     @Max(Integer.MAX_VALUE)
     private Integer price;
 
-    private MultipartFile picture;
-
-    private String pictureUrl;
+    private String picture;
 
     private String description;
 

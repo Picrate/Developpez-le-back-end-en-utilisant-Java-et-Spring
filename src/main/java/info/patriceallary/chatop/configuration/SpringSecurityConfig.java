@@ -4,7 +4,7 @@
 package info.patriceallary.chatop.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import info.patriceallary.chatop.services.CustomUserDetailsService;
+import info.patriceallary.chatop.services.auth.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,8 +36,8 @@ public class SpringSecurityConfig {
     @Value("${JWT_SECRET_KEY}")
     private String jwtKey;
 
-    public SpringSecurityConfig(CustomUserDetailsService customUserDetailsService) {
-    }
+    @Value("${picture.uri}")
+    private String pictureUri;
 
     /**
      * SecurityFilterChain used for managing authorization through the application
@@ -53,9 +53,9 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/pictures/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();

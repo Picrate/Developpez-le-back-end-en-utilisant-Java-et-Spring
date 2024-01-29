@@ -1,4 +1,4 @@
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.storage;
 
 
 import org.springframework.core.io.Resource;

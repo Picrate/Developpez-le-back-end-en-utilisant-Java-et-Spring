@@ -2,10 +2,11 @@
  * This class generate a userDetails service from a userObject
  * It is used in application for authorization
  */
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.auth;
 
 import info.patriceallary.chatop.domain.model.Role;
 import info.patriceallary.chatop.domain.model.User;
+import info.patriceallary.chatop.services.domain.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

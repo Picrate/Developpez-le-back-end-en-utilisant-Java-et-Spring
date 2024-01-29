@@ -4,41 +4,43 @@
  * https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
  */
 
-package info.patriceallary.chatop.services;
+package info.patriceallary.chatop.services.tools;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.UUID;
 
 @Service
 @Slf4j
 public class PictureManager {
 
+    @Value("${picture.uri}")
+    private String pictureEndpoint;
+
+    private final URLManager urlManager;
+
+    public PictureManager(URLManager urlManager) {
+        this.urlManager = urlManager;
+    }
+
     /**
      * Cleanup & encode filename
      * Sanitize filename By renaming it with a unique random name & encode in Base64
      * @param file
-     * @return BASE64 Encoded Unique Filename
+     * @return the file renamed with a Encoded & Unique name
      * @throws FileNotFoundException
      */
     public String sanitizeAndEncodeFilename(MultipartFile file) throws FileNotFoundException {
         // Encode filename to Base64
         if (file != null && !file.isEmpty()) {
-            String newFileName = createUniqueFilename(this.getExtension(file));
-            log.info("Unique filename : "+newFileName);
-            log.info("Encoded fileName : "+this.encodeFileName(newFileName));
-            return this.encodeFileName(newFileName);
+            return createUniqueFilename(this.getExtension(file));
         } else {
             throw new FileNotFoundException();
         }
-    }
-    private String encodeFileName(String filename) {
-        return Base64.getEncoder().encodeToString(filename.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -84,6 +86,10 @@ public class PictureManager {
      */
     private String createUniqueFilename(String extension) {
         return UUID.randomUUID().toString() + "." + extension;
+    }
+
+    public String getPictureUrl(String filename, String requestURL) {
+        return this.urlManager.getPicturesBaseUrlFromRequestUrl(requestURL).append(filename).toString();
     }
 
 }
