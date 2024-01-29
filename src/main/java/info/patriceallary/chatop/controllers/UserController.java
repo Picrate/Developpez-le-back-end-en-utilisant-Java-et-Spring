@@ -19,7 +19,7 @@ public class UserController {
         this.dtoService = dtoService;
     }
 
-    @GetMapping("/{requestdId}")
+    @GetMapping("/{requestedId}")
     public ResponseEntity<UserDto> getUserProfile(@PathVariable Integer requestedId){
         return ResponseEntity.ok(this.dtoService.getUserDtoForUserId(requestedId));
     }
