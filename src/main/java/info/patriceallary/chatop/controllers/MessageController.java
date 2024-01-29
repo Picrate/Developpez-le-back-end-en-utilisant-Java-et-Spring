@@ -22,6 +22,7 @@ public class MessageController {
         this.messageService = messageService;
     }
 
+    // Post new Message for a rental
     @PostMapping("/")
     public ResponseEntity<ResponseDto> postNewMessage(@RequestBody MessageDto messageDto) {
         this.messageService.save(dtoService.convertToMessage(messageDto));

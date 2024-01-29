@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -62,6 +63,14 @@ public class DtoService {
 
     public UserDto convertToUserDto(User user) {
         return modelMapper.map(user, UserDto.class);
+    }
+
+    public UserDto getUserDtoForUserId(Integer id){
+        Optional<User> optionalUser = this.userService.getUserById(id);
+        if (optionalUser.isEmpty()){
+            throw new NoSuchElementException("User Not Found !");
+        }
+        return modelMapper.map(optionalUser.get(), UserDto.class);
     }
 
     /*

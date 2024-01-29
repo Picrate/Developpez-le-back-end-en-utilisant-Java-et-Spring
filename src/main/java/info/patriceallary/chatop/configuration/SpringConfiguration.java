@@ -18,8 +18,6 @@ public class SpringConfiguration implements WebMvcConfigurer {
     String pictureLocation;
     @Value("${picture.directory.name}")
     String pictureDirectoryName;
-    @Value("${picture.uri}")
-    String pictureBaseURL;
 
     @Bean
     public ModelMapper modelMapper(){

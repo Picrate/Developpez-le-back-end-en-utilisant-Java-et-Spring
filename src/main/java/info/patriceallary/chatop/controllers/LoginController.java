@@ -59,6 +59,7 @@ public class LoginController {
         return response;
     }
 
+    // Register new User
     @PostMapping("/register")
     public ResponseEntity<TokenDto> registerUser(@RequestBody @Valid RegisterDto registerDto) {
         // Default Response BadRequest(400)
@@ -76,7 +77,7 @@ public class LoginController {
     /**
      * Send logged-in user account information
      *
-     * @param principal BearerTokon of logged in user
+     * @param principal BearerToken of logged in user
      * @return Account information without password
      */
     @GetMapping("/me")

@@ -36,9 +36,6 @@ public class SpringSecurityConfig {
     @Value("${JWT_SECRET_KEY}")
     private String jwtKey;
 
-    @Value("${picture.uri}")
-    private String pictureUri;
-
     /**
      * SecurityFilterChain used for managing authorization through the application
      */
@@ -61,6 +58,7 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
+    // Token Bearer Decoder
     @Bean
     public JwtDecoder jwtDecoder() {
         SecretKeySpec secretKey = new SecretKeySpec(
@@ -71,6 +69,8 @@ public class SpringSecurityConfig {
         return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
+
+    // Token Bearer Encoder
     @Bean
     public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(this.jwtKey.getBytes(StandardCharsets.UTF_8)));
@@ -82,7 +82,7 @@ public class SpringSecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    // Manage Authentication throught application
+    // Manage Authentication through application
     @Bean
     public AuthenticationManager authenticationManager(
             CustomUserDetailsService userDetailsService,
