@@ -86,5 +86,4 @@ public class PictureManager {
         return UUID.randomUUID().toString() + "." + extension;
     }
 
-
 }

@@ -3,6 +3,7 @@ package info.patriceallary.chatop.services;
 import info.patriceallary.chatop.domain.dto.LoginDto;
 import info.patriceallary.chatop.domain.dto.RegisterDto;
 import info.patriceallary.chatop.domain.model.User;
+import info.patriceallary.chatop.services.dto.DtoService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

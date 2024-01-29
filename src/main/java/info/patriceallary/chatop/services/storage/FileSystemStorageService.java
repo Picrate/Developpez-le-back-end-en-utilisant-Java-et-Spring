@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.file.*;
 
 @Service
@@ -79,6 +80,8 @@ public class FileSystemStorageService implements StorageService {
     public Path load(String filename) {
         return rootLocation.resolve(filename);
     }
+
+    public URI getURI(String filename) {return rootLocation.resolve(filename).toUri(); }
 
     @Override
     public Resource loadAsResource(String filename) {

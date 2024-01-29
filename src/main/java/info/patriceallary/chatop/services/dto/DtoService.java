@@ -6,6 +6,7 @@ import info.patriceallary.chatop.domain.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.sql.Timestamp;
@@ -44,26 +45,14 @@ public class DtoService {
     }
 
     public LoginDto convertRegisterDtoToLoginDto(RegisterDto registerDto) {
-        LoginDto loginDto = new LoginDto();
-        loginDto.setLogin(registerDto.getEmail());
-        loginDto.setPassword(registerDto.getPassword());
-        return loginDto;
+        modelMapper.typeMap(RegisterDto.class, LoginDto.class).addMapping(
+                RegisterDto::getEmail, LoginDto::setLogin
+        );
+        return modelMapper.map(registerDto, LoginDto.class);
     }
 
-    public Rental convertToRental(RentalDto rentalDto) {
-        if (Boolean.TRUE.equals(this.pictureManager.isValidPicture(rentalDto.getPicture())))
-        {
-            String encodedFileName = null;
-            try {
-                encodedFileName = this.pictureManager.sanitizeAndEncodeFilename(rentalDto.getPicture());
-                this.storageService.store(rentalDto.getPicture(), encodedFileName);
+    public Rental convertToRental(RentalDto rentalDto, MultipartFile picture) {
 
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            rentalDto.setPictureUrl(encodedFileName);
-        }
-        return modelMapper.map(rentalDto, Rental.class);
     }
 
     public MessageDto convertToMessageDto(String message){
@@ -90,5 +79,25 @@ public class DtoService {
     }
 
 
+    public Rental convertFormRentalDtoToRental(FormRentalDto formRentalDto) {
 
+        String pictureURL = "N/A";
+
+        if (Boolean.TRUE.equals(this.pictureManager.isValidPicture(formRentalDto.getPicture())))
+        {
+            String encodedFileName = null;
+            try {
+                encodedFileName = this.pictureManager.sanitizeAndEncodeFilename(formRentalDto.getPicture());
+                this.storageService.store(formRentalDto.getPicture(), encodedFileName);
+
+                pictureURL = this.storageService.getURI(encodedFileName).getPath();
+
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+        modelMapper.typeMap(FormRentalDto.class, Rental.class).
+        return modelMapper.map(rentalDto, Rental.class);
+    }
 }
