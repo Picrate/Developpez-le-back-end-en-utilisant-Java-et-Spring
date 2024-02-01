@@ -122,7 +122,7 @@ The application will automatically reload if you change any of the source files.
 ## To build production files
 Run:
 ```bash
-ng build
+gradle build
 ```
 The build artifacts will be stored in the `build/libs` directory.
 
