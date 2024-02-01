@@ -24,7 +24,7 @@ Chatop Rental App is a REST backend Application for helping house owner to conne
 - Spring Security & OAuth2 Resource Server
 - Spring Data JPA
 - Spring Validation
-- Spring modelmapper extension v. 3.1.1
+- Modelmapper v. 3.1.1
 - Springdoc openapi v. 2.3.0
 - Project lombok v. 1.18.30
 - MariaDB JDBC driver
@@ -115,9 +115,10 @@ Then:
 ```bash
 gradlew bootRun
 ```
+This will start a development server on your local machine.
+Application server is now accessible to `http://localhost:3001/`.
 
-This will start a development server on your local machine. Now, you can navigate to `http://localhost:4200/`.
-The application will automatically reload if you change any of the source files.
+You can use a tool like https://www.postman.com/ to query endpoints listed in swagger documentation: http://localhost:3001/swagger-ui.html
 
 ## To build production files
 Run:
