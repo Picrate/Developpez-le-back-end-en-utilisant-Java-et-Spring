@@ -38,7 +38,7 @@ public class LoginAndRegisterService {
 
         // Prepared authentication as unauthenticated request
         Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(
-                loginDto.getLogin(),
+                loginDto.getEmail(),
                 loginDto.getPassword()
         );
         // Perform authentication

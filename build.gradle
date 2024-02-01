@@ -5,10 +5,15 @@ plugins {
 }
 
 group = 'info.patrice-allary'
-version = '0.0.1-SNAPSHOT'
+version = '1.2.1'
 
 java {
 	sourceCompatibility = '17'
+}
+
+jar {
+	archiveBaseName = 'chatop'
+	archiveVersion = '1.2.1'
 }
 
 repositories {
@@ -17,7 +22,7 @@ repositories {
 
 dependencies {
 
-	implementation 'org.modelmapper.extensions:modelmapper-spring:3.1.1'
+	implementation 'org.modelmapper:modelmapper:3.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

@@ -47,12 +47,11 @@ public class PictureManager {
      * @param file
      * @return true if valid or false either
      */
-    public Boolean isValidPicture(MultipartFile file) {
-        Boolean isValid = false;
+    public boolean isValidPicture(MultipartFile file) {
+        boolean isValid = false;
         if (file == null || file.getContentType() == null) {
             throw new StorageException("File or ContentType is Null !");
-        }
-        if (!file.isEmpty() && !file.getContentType().isBlank()) {
+        }else if (!file.isEmpty() && !file.getContentType().isBlank()) {
                isValid = file.getContentType().matches("^image/((jpeg)|(jpg)|(png))$");
         }
         return isValid;

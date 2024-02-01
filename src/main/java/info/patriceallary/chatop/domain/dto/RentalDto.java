@@ -37,6 +37,7 @@ public class RentalDto {
     @Pattern(regexp = VALID_DATE_PATTERN)
     private String created_at;
 
+
     @Pattern(regexp = VALID_DATE_PATTERN)
     private String updated_at;
 
