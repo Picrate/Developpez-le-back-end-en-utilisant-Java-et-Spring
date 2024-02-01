@@ -36,7 +36,7 @@ public class RentalService {
         rentalToUpdate.setDescription(rentalUpdated.getDescription());
         rentalToUpdate.setPrice(rentalUpdated.getPrice());
         rentalToUpdate.setSurface(rentalUpdated.getSurface());
-        rentalToUpdate.setUpdated_at(Timestamp.valueOf(LocalDate.now().atStartOfDay()));
+        rentalToUpdate.setUpdatedAt(Timestamp.valueOf(LocalDate.now().atStartOfDay()));
         this.rentalRepository.saveAndFlush(rentalToUpdate);
     }
 
@@ -46,7 +46,7 @@ public class RentalService {
     public void save(Rental rental, String principalName) {
         // Rental Already exists -> update
         if (rental.getId() != null) {
-            rental.setUpdated_at(Timestamp.valueOf(LocalDate.now().atStartOfDay()));
+            rental.setUpdatedAt(Timestamp.valueOf(LocalDate.now().atStartOfDay()));
         }
         // Get Owner
         Optional<User> optionalUser = this.userService.getUserByEmail(principalName);

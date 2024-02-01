@@ -2,6 +2,7 @@ package info.patriceallary.chatop.controllers;
 
 import info.patriceallary.chatop.domain.dto.FormRentalDto;
 import info.patriceallary.chatop.domain.dto.RentalDto;
+import info.patriceallary.chatop.domain.dto.RentalListDto;
 import info.patriceallary.chatop.domain.dto.ResponseDto;
 import info.patriceallary.chatop.services.domain.RentalService;
 import info.patriceallary.chatop.services.dto.DtoService;
@@ -28,7 +29,7 @@ public class RentalController {
     }
 
     @GetMapping()
-    public ResponseEntity<Iterable<RentalDto>> getAllRentals() {
+    public ResponseEntity<RentalListDto> getAllRentals() {
         return ResponseEntity.ok(this.dtoService.getAllRentalDtos());
     }
 

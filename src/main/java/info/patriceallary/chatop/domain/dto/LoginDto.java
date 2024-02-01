@@ -15,7 +15,7 @@ public class LoginDto {
 
     @NotBlank
     @Email
-    private String login;
+    private String email;
 
     @NotBlank
     @Size(min = 7, max = 255)

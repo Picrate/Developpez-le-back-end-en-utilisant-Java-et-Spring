@@ -26,8 +26,8 @@ public class UserDto {
 
     @NotEmpty
     @Pattern(regexp = VALID_DATE_PATTERN)
-    private String createdAt;
+    private String created_at;
 
     @Pattern(regexp = VALID_DATE_PATTERN)
-    private String updatedAt;
+    private String updated_at;
 }
