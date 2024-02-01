@@ -1,7 +1,6 @@
 package info.patriceallary.chatop.controllers;
 
 import info.patriceallary.chatop.domain.dto.UserDto;
-import info.patriceallary.chatop.services.domain.UserService;
 import info.patriceallary.chatop.services.dto.DtoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserController {
 
     private final DtoService dtoService;

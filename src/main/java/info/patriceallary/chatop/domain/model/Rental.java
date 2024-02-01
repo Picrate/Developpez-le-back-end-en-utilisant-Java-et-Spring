@@ -43,10 +43,10 @@ public class Rental implements Serializable {
     private User owner;
 
     @Column(name = "created_at", nullable = false)
-    private Timestamp created_at;
+    private Timestamp createdAt;
 
     @Column(name = "updated_at")
-    private Timestamp updated_at;
+    private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "rental")
     private List<Message> messages = new ArrayList<>();

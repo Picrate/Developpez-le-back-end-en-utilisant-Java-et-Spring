@@ -27,10 +27,10 @@ public class Message implements Serializable {
     private String message;
 
     @Column(name = "created_at", nullable = false)
-    private Timestamp created_at;
+    private Timestamp createdAt;
 
     @Column(name = "updated_at")
-    private Timestamp updated_at;
+    private Timestamp updatedAt;
 
     @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
@@ -47,6 +47,6 @@ public class Message implements Serializable {
         this.message = message;
         this.user = user;
         this.rental = rental;
-        this.created_at = Timestamp.valueOf(LocalDateTime.now());
+        this.createdAt = Timestamp.valueOf(LocalDateTime.now());
     }
 }
