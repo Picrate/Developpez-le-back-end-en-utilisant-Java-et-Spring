@@ -136,6 +136,8 @@ Launch jar with:
 ```shell
 java -jar chatop-version.jar
 ```
+## Accessing to OpenApi documentation
+Simply go to http://localhost:3001/swagger-ui.html
 
 # 🤝 Contributors
 

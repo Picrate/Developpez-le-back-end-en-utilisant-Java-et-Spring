@@ -19,7 +19,6 @@ public class StorageLocation {
     public StorageLocation(String path, String directory) {
         this.path = path;
         this.directory = directory;
-        log.info("Storage Location : "+ getPath().toString());
     }
 
     public Path getPath() {

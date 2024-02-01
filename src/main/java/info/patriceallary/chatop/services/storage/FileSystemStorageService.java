@@ -29,7 +29,6 @@ public class FileSystemStorageService implements StorageService {
             throw new StorageException("File upload location can not be Empty.");
         }
         this.rootLocation = configuration.getPictureStorageLocation().getPath();
-        log.info("FileStorageLocation : "+this.rootLocation.toString());
     }
 
     @Override

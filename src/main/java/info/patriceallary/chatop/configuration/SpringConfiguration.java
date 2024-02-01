@@ -53,10 +53,7 @@ public class SpringConfiguration implements WebMvcConfigurer {
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().addSecurityItem(new SecurityRequirement().
-                        addList("Bearer Authentication"))
-                .components(new Components().addSecuritySchemes
-                        ("Bearer Authentication", createAPIKeyScheme()))
+        return new OpenAPI()
                 .info(new Info().title("Chatop Rental REST API")
                         .description("Chatop Home Rental Application OpenApi 3.0 Documentation.")
                         .version("1.0").contact(new Contact().name("Patrice ALLARY")
@@ -64,12 +61,4 @@ public class SpringConfiguration implements WebMvcConfigurer {
                         .license(new License().name("OpenApi 3.0")
                                 .url("https://swagger.io/specification/")));
     }
-
-    private SecurityScheme createAPIKeyScheme() {
-        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
-                .bearerFormat("JWT")
-                .scheme("bearer");
-    }
-
-
 }

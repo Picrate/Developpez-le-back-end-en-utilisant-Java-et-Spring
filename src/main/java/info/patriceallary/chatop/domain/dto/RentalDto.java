@@ -17,20 +17,26 @@ public class RentalDto {
     @Size(min = 1, max = 255)
     private String name;
 
+    @NotEmpty
     @Positive
     @Max(Integer.MAX_VALUE)
     private Integer surface;
 
+    @NotEmpty
     @Positive
     @Max(Integer.MAX_VALUE)
     private Integer price;
 
+    @NotBlank
     private String picture;
 
     @NotBlank
     @Size(max = 2000)
     private String description;
 
+    @NotEmpty
+    @Positive
+    @Max(Integer.MAX_VALUE)
     private Integer owner_id;
 
     @NotBlank
