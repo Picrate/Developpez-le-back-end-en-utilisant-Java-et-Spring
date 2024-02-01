@@ -1,14 +1,19 @@
 package info.patriceallary.chatop.controllers;
 
-import info.patriceallary.chatop.domain.dto.LoginDto;
-import info.patriceallary.chatop.domain.dto.RegisterDto;
-import info.patriceallary.chatop.domain.dto.TokenDto;
-import info.patriceallary.chatop.domain.dto.UserDto;
+import info.patriceallary.chatop.domain.dto.*;
 import info.patriceallary.chatop.domain.model.User;
 import info.patriceallary.chatop.services.dto.DtoService;
 import info.patriceallary.chatop.services.auth.JWTService;
 import info.patriceallary.chatop.services.auth.LoginAndRegisterService;
 import info.patriceallary.chatop.services.domain.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +27,12 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@SecurityScheme(
+        name = "bearerToken",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+)
 public class LoginController {
 
     private final LoginAndRegisterService loginAndRegisterService;
@@ -31,7 +42,6 @@ public class LoginController {
     private final DtoService dtoService;
 
     private final JWTService jwtService;
-
     public LoginController(JWTService jwtService, LoginAndRegisterService loginAndRegisterService, DtoService dtoService, UserService userService) {
         this.jwtService = jwtService;
         this.loginAndRegisterService = loginAndRegisterService;
@@ -39,13 +49,22 @@ public class LoginController {
         this.userService = userService;
     }
 
-    /**
-     * Login existing user with email and password
-     *
-     * @param loginDto data send through request
-     * @return OK Response (200) with Bearer Token in body if login succeeded or unauthorized(401) Response
-     */
     @PostMapping("/login")
+    @Operation(description = "Login as a registred user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication Success", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TokenDto.class)
+                    )
+            }),
+            @ApiResponse(responseCode = "401", description = "Authentication Failure", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDto.class)
+                    )
+            })
+    })
     public ResponseEntity<TokenDto> authenticateUser(@RequestBody @Valid LoginDto loginDto) {
 
         ResponseEntity<TokenDto> response = ResponseEntity.noContent().build();
@@ -60,6 +79,15 @@ public class LoginController {
 
     // Register new User
     @PostMapping("/register")
+    @Operation(description = "Register as a new user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Register as a new Success", content = {
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TokenDto.class)
+                    )
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid data supplied")})
     public ResponseEntity<TokenDto> registerUser(@RequestBody @Valid RegisterDto registerDto) {
         // Default Response BadRequest(400)
         ResponseEntity<TokenDto> response = ResponseEntity.badRequest().build();
@@ -73,13 +101,36 @@ public class LoginController {
         return response;
     }
 
-    /**
-     * Send logged-in user account information
-     *
-     * @param principal BearerToken of logged in user
-     * @return Account information without password
-     */
+    // My User Profile
     @GetMapping("/me")
+    @Operation(summary = "My user profile informations",
+            description = "Show my user profile informations",
+            security = {@SecurityRequirement(name = "bearerToken")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "OK",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = UserDto.class)
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = {
+                            @Content()
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content()
+                    }
+            )
+    })
     public ResponseEntity<UserDto> aboutMe(JwtAuthenticationToken principal) {
         UserDto dto;
         // if user exists
