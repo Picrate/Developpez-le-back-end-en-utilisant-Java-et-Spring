@@ -5,10 +5,15 @@ plugins {
 }
 
 group = 'info.patrice-allary'
-version = '0.0.1-SNAPSHOT'
+version = '1.2.1'
 
 java {
 	sourceCompatibility = '17'
+}
+
+jar {
+	archiveBaseName = 'chatop'
+	archiveVersion = '1.2.1'
 }
 
 repositories {
